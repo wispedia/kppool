@@ -14,5 +14,11 @@
             "email": "wispedia@126.com"
         }
     ],
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Kppool\\Channel\\":"src/channel",
+            "KPPool\\Forker\\":"src/forker"
+        }
+    }
 }

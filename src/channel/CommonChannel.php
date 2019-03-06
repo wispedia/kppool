@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Scheduler\Libs\Channel;
+namespace Kppool\Channel;
 
 
 class CommonChannel {

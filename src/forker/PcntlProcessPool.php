@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Scheduler\Libs\Forker;
+namespace Kppool\Forker;
 
 
 class PcntlProcessPool implements ProcessPoolInterface {

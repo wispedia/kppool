@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Scheduler\Libs\Forker;
+namespace Kppool\Forker;
 
-use App\Scheduler\Libs\Channel\ChannelInterface;
+use Kppool\Channel\ChannelInterface;
 
 interface ProcessInterface {
 
