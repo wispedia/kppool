@@ -7,7 +7,7 @@
         "ext-apcu": "^5.1",
         "ext-pcntl": "^7.2"
     },
-    "license": "Apache License 2.0",
+    "license": "Apache",
     "authors": [
         {
             "name": "wispedia",
