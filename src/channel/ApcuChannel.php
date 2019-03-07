@@ -7,7 +7,7 @@ class ApcuChannel extends CommonChannel implements ChannelInterface {
 	public function read() {
 		do {
 			$value = apcu_fetch($this->project);
-			usleep(1);
+			usleep(10);
 		} while ($value === false);
 
 		return $value;
@@ -22,6 +22,6 @@ class ApcuChannel extends CommonChannel implements ChannelInterface {
 	}
 
 	public function isEmpty(): bool {
-		return apcu_exists($this->project);
+		return (apcu_fetch($this->project) === false);
 	}
 }

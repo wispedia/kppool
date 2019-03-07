@@ -3,7 +3,6 @@
 namespace Kppool\Forker;
 
 
-
 class PcntlProcessPool implements ProcessPoolInterface {
 
 	//	进程表
@@ -26,6 +25,9 @@ class PcntlProcessPool implements ProcessPoolInterface {
 
 	public function run() {
 		while (true) {
+			if (empty($this->task_table)) {
+				goto WAIT;
+			}
 			foreach ($this->process_table as $pid => $channel) {
 				if ($this->isRunning($pid)) {
 					if ($this->isIdle($pid)) {
@@ -51,14 +53,11 @@ class PcntlProcessPool implements ProcessPoolInterface {
 		while (true) {
 			$all_finish = false;
 			foreach ($this->process_table as $pid => $channel) {
-				if (!$this->isRunning($pid)) {
-					$this->create();
-				}
-				if (!$this->isIdle()) {
+				if (!$this->isIdle($pid)) {
 					$all_finish = true;
 				}
 			}
-			if ($all_finish) {
+			if (!$all_finish) {
 				break;
 			}
 		}
@@ -66,7 +65,7 @@ class PcntlProcessPool implements ProcessPoolInterface {
 
 	public function init() {
 		$i = 0;
-		while ($i < $this->max_p_num) {
+		while ($i < $this->max_process_num) {
 			if ($this->create()) {
 				$i++;
 			}
@@ -95,11 +94,13 @@ class PcntlProcessPool implements ProcessPoolInterface {
 
 	public function create() {
 		$channel_name = uniqid("channel_", true);
+		$channel_name = md5($channel_name);
+		$ppid         = posix_getpid();
 		$pid          = pcntl_fork();
 		if ($pid == 0) {
 			//				子进程处理
 			$channel       = new $this->channel_class($channel_name);
-			$child_process = new Process();
+			$child_process = new Process($ppid);
 			//				子进程会阻塞在这里，永远不退出
 			$child_process->subscribe($channel);
 		}
@@ -121,8 +122,15 @@ class PcntlProcessPool implements ProcessPoolInterface {
 
 	public function pub(int $pid, $value): bool {
 		$channel = $this->process_table[ $pid ];
+		$res     = $channel->write($value);
 
-		return $channel->write($value);
+		return $res;
+	}
+
+	public function __destruct() {
+		foreach ($this->process_table as $pid => $channel) {
+			posix_kill($pid, SIGKILL);
+		}
 	}
 
 }

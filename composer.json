@@ -18,7 +18,7 @@
     "autoload": {
         "psr-4": {
             "Kppool\\Channel\\":"src/channel",
-            "KPPool\\Forker\\":"src/forker"
+            "Kppool\\Forker\\":"src/forker"
         }
     }
 }
