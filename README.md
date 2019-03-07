@@ -6,7 +6,7 @@ PHP进程池
 ### 依赖
 
 - php>=7.0.0
-- ext-apcu>=^5.1,
+- ext-apcu>=^5.1
 - ext-pcntl>=^7.2
 
 ### 示例
