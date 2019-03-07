@@ -3,6 +3,7 @@
 namespace Kppool\Forker;
 
 
+
 class PcntlProcessPool implements ProcessPoolInterface {
 
 	//	进程表
@@ -24,9 +25,44 @@ class PcntlProcessPool implements ProcessPoolInterface {
 
 
 	public function run() {
+		while (true) {
+			foreach ($this->process_table as $pid => $channel) {
+				if ($this->isRunning($pid)) {
+					if ($this->isIdle($pid)) {
+						$task = array_shift($this->task_table);
+						if (empty($task) || empty($this->task_table)) {
+							goto WAIT;
+						}
+						$this->pub($pid, $task);
+					}
+				} else {
+					$this->create();
+				}
+			}
+			continue;
 
+			WAIT:
+			$this->wait();
+			break;
+		}
 	}
 
+	public function wait() {
+		while (true) {
+			$all_finish = false;
+			foreach ($this->process_table as $pid => $channel) {
+				if (!$this->isRunning($pid)) {
+					$this->create();
+				}
+				if (!$this->isIdle()) {
+					$all_finish = true;
+				}
+			}
+			if ($all_finish) {
+				break;
+			}
+		}
+	}
 
 	public function init() {
 		$i = 0;
@@ -49,6 +85,10 @@ class PcntlProcessPool implements ProcessPoolInterface {
 
 	public function isRunning(int $pid): bool {
 		$result = pcntl_waitpid($pid, $status, WNOHANG);
+
+		if ($result !== 0) {
+			unset($this->process_table[ $pid ]);
+		}
 
 		return ($result === 0);
 	}
