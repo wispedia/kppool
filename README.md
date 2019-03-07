@@ -9,6 +9,10 @@ PHP进程池
 - ext-apcu>=^5.1
 - ext-pcntl>=^7.2
 
+### 安装依赖
+```bash
+    composer require wispedia/kppool
+```
 ### 示例
 ```php
     use Kppool\Forker\PcntlProcessPool;
